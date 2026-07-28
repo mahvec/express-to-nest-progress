@@ -49,6 +49,25 @@ app.post("/api/auth/login", (req, res) => {
   res
     .status(200)
     .send({ msg: "Login successful", user: findUser, session: req.session.id });
+  console.log(req.session.id);
+});
+
+app.post("/api/cart", (req, res) => {
+  if (!req.session.user) return res.status(401).send({ msg: "Unauthorized" });
+  const { body: item } = req;
+
+  const { cart } = req.session;
+  if (cart) {
+    cart.push(item);
+  } else {
+    req.session.cart = [item];
+  }
+  return res.status(200).send({ msg: "Item added to cart", item , cart});
+});
+
+app.get("/api/cart", (req, res) => {
+  if (!req.session.user) return res.status(401).send({ msg: "Unauthorized" });
+  return res.send(req.session.cart ?? []);
 });
 
 app.listen(PORT, () => {
